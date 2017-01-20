@@ -2,6 +2,8 @@ const app = require('express')();
 const config = require('config');
 const bodyParser = require('body-parser');
 
+const rates = require('./components/rates');
+
 app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded()); Uncomment to support x-www-form-urlencoded
 
@@ -15,6 +17,10 @@ app.all('/*', (req, res, next) => {
 
 app.get('/', (req, res) => {
   res.send('Smartnode API');
+});
+
+app.get('/ethsgd', (req, res) => {
+  rates.ETHSGD().then(value => res.send(value));
 });
 
 const server = app.listen(config.get('server.port'), () => {

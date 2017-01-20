@@ -19,4 +19,14 @@ module.exports = {
     account: 0, // Unlocked admin account, either address or int (i-th account at web3.eth.accounts)
     defaultGas: 100000,
   },
+
+  ext: {
+    /**
+     * For ETHSGD rates only
+     */
+    coinbase: {
+      apiKey: 'COINBASE API KEY',
+      apiSecret: 'COINBASE API SECRET',
+    },
+  },
 };
