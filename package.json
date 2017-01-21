@@ -4,7 +4,11 @@
   "description": "For communication with SmartNode iOS app",
   "main": "index.js",
   "scripts": {
-    "start": "node .",
+    "build": "truffle build",
+    "console": "truffle console",
+    "migrate": "truffle migrate",
+    "deploy": "truffle migrate",
+    "start": "truffle build && truffle migrate && node .",
     "lint": "eslint --ext=js --ignore-path .gitignore ."
   },
   "repository": {
@@ -22,6 +26,7 @@
     "coinbase": "^2.0.6",
     "config": "^1.24.0",
     "express": "^4.14.0",
+    "truffle": "^2.1.1",
     "web3": "^0.18.2"
   },
   "devDependencies": {

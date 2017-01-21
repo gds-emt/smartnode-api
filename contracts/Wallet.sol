@@ -1,6 +1,9 @@
 pragma solidity ^0.4.4;
 
-contract SmartNodeWallet {
+/**
+ * Wallet for Smart Node clients
+ */
+contract Wallet {
   address public owner;
 
   event Deposit(address indexed _from, uint256 _value);
