@@ -15,8 +15,8 @@ module.exports = {
     port: 8545,
   },
 
-  admin: {
-    account: 0, // Unlocked admin account, either address or int (i-th account at web3.eth.accounts)
+  eth: {
+    account: 0, // Unlocked account, either address or int (i-th account at web3.eth.accounts)
     defaultGas: 100000,
   },
 

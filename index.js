@@ -2,6 +2,7 @@ const app = require('express')();
 const config = require('config');
 const bodyParser = require('body-parser');
 
+const ethnode = require('./components/ethnode');
 const rates = require('./components/rates');
 
 app.use(bodyParser.json());
@@ -17,6 +18,10 @@ app.all('/*', (req, res, next) => {
 
 app.get('/', (req, res) => {
   res.send('Smartnode API');
+});
+
+app.get('/status', (req, res) => {
+  res.send(ethnode.status());
 });
 
 app.get('/ethsgd', (req, res) => {
