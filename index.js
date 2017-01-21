@@ -2,7 +2,7 @@ const app = require('express')();
 const config = require('config');
 const bodyParser = require('body-parser');
 
-const ethnode = require('./components/ethnode');
+const wallet = require('./components/wallet');
 const rates = require('./components/rates');
 
 app.use(bodyParser.json());
@@ -12,7 +12,7 @@ app.all('/*', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('X-Powered-By', 'onebit-api');
+  res.header('X-Powered-By', 'smartnode-api');
   next();
 });
 
@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/status', (req, res) => {
-  res.send(ethnode.status());
+  res.send(wallet.status());
 });
 
 app.get('/ethsgd', (req, res) => {

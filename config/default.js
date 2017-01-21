@@ -16,7 +16,7 @@ module.exports = {
   },
 
   eth: {
-    account: 0, // Unlocked account, either address or int (i-th account at web3.eth.accounts)
+    walletOwnerAccount: 0, // Unlocked account, either address or int (i-th account at web3.eth.accounts)
     defaultGas: 100000,
   },
 
