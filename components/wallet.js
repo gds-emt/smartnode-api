@@ -21,7 +21,7 @@ function transactions() {
         time: '2017-01-22T08:08:12Z',
         address: '0xc0ea08a2d404d3172d2add29a45be56da40e2949',
         value: '-4250000000000000000',
-        order: {
+        service: {
           name: 'Singapore Power',
           icon: 'https://media.glassdoor.com/sqll/389323/singapore-power-squarelogo-1398797969587.png',
           description: 'Power consumption for the month',
@@ -33,7 +33,7 @@ function transactions() {
         time: '2017-01-22T08:07:59Z',
         address: '0xc0ea08a2d404d3172d2add29a45be56da40e2949',
         value: '-8540000000000000000',
-        order: {
+        service: {
           name: 'honestbee',
           icon: 'https://pbs.twimg.com/profile_images/743759173834334209/GcCRFPRh.jpg',
           description: '100 Nespresso capsules',
@@ -47,13 +47,13 @@ function transactions() {
         value: '25000000000000000000',
       },
       {
-        type: 'order', // order, receive or send
+        type: 'service', // order, receive or send
         time: '2017-01-18T08:07:59Z',
         address: '0x83d367e3a6b4e3c58d402b324e04472c28e96637',
         value: '-452000000000000000',
-        order: {
+        service: {
           name: 'Uber',
-          icon: 'http://cdn.geekwire.com/wp-content/uploads/2016/02/uberriderlogo-e1454443856991-300x300.png',
+          icon: 'https://pbs.twimg.com/profile_images/697242369154940928/p9jxYqy5.png',
           description: 'Ride to office',
           complete: true,
         },
