@@ -28,6 +28,10 @@ app.get('/ethsgd', (req, res) => {
   rates.ETHSGD().then(value => res.send(value));
 });
 
+app.get('/transactions', (req, res) => {
+  wallet.transactions().then(response => res.send(response));
+});
+
 const server = app.listen(config.get('server.port'), () => {
   const host = server.address().address;
   const port = server.address().port;
