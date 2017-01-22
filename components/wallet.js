@@ -16,7 +16,7 @@ function status() {
 function transactions() {
   return new Promise((resolve) => {
     const data = [
-    {
+      {
         type: 'service', // service, receive or send
         time: '2017-01-22T08:08:12Z',
         address: '0xc0ea08a2d404d3172d2add29a45be56da40e2949',
@@ -24,7 +24,7 @@ function transactions() {
         order: {
           name: 'Singapore Power',
           icon: 'https://media.glassdoor.com/sqll/389323/singapore-power-squarelogo-1398797969587.png',
-          descrition: 'Power consumption for the month',
+          description: 'Power consumption for the month',
           complete: true,
         },
       },
@@ -36,7 +36,7 @@ function transactions() {
         order: {
           name: 'honestbee',
           icon: 'https://pbs.twimg.com/profile_images/743759173834334209/GcCRFPRh.jpg',
-          descrition: '100 Nespresso capsules',
+          description: '100 Nespresso capsules',
           complete: false, // still pending refund or processing
         },
       },
@@ -54,7 +54,7 @@ function transactions() {
         order: {
           name: 'Uber',
           icon: 'http://cdn.geekwire.com/wp-content/uploads/2016/02/uberriderlogo-e1454443856991-300x300.png',
-          descrition: 'Ride to office',
+          description: 'Ride to office',
           complete: true,
         },
       },

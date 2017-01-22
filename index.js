@@ -21,17 +21,22 @@ app.get('/', (req, res) => {
 });
 
 app.get('/status', (req, res) => {
-  res.send(wallet.status());
+  Promise.all([wallet.status(), wallet.transactions()]).then((responses) => {
+    const results = responses[0];
+    results.transactions = responses[1];
+    res.send(results);
+  });
 });
 
 app.get('/ethsgd', (req, res) => {
   rates.ETHSGD().then(value => res.send(value));
 });
 
+/*
 app.get('/transactions', (req, res) => {
   wallet.transactions().then(response => res.send(response));
 });
-
+*/
 const server = app.listen(config.get('server.port'), () => {
   const host = server.address().address;
   const port = server.address().port;
