@@ -1,7 +1,11 @@
-const app = require('express')();
+const express = require('express');
+const fs = require('fs');
+const https = require('https');
+const http = require('http');
 const config = require('config');
 const bodyParser = require('body-parser');
 
+const app = express();
 const wallet = require('./components/wallet');
 const rates = require('./components/rates');
 
@@ -37,9 +41,27 @@ app.get('/transactions', (req, res) => {
   wallet.transactions().then(response => res.send(response));
 });
 */
-const server = app.listen(config.get('server.port'), () => {
+const server = http.createServer(app).listen(config.get('server.port'), () => {
+// const server = app.listen(config.get('server.port'), () => {
   const host = server.address().address;
   const port = server.address().port;
 
   console.log(`Smartnode API server is now listening at http://${host}:${port}`);
 });
+
+/**
+ * Starts HTTPS server
+ */
+if (config.get('server.https') && config.get('server.https.port')) {
+  const options = {};
+  if (config.get('server.https.key') && config.get('server.https.cert')) {
+    options.key = fs.readFileSync(config.get('server.https.key'));
+    options.cert = fs.readFileSync(config.get('server.https.cert'));
+  }
+  const httpsServer = https.createServer(options, app).listen(config.get('server.https.port'), () => {
+    const host = httpsServer.address().address;
+    const port = httpsServer.address().port;
+
+    console.log(`Smartnode HTTPS API server is now listening at http://${host}:${port}`);
+  });
+}

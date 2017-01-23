@@ -7,7 +7,13 @@
  */
 module.exports = {
   server: {
-    port: 4000,
+    port: 4000, // http port
+
+    https: {
+      port: 8443, // leave null to disable https
+      key: 'path/to/key.pem',
+      cert: 'path/to/cert.pem',
+    },
   },
 
   rpc: {
