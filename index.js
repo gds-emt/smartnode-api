@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const wallet = require('./components/wallet');
 const rates = require('./components/rates');
+const services = require('./components/services');
 
 app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded()); Uncomment to support x-www-form-urlencoded
@@ -34,6 +35,12 @@ app.get('/status', (req, res) => {
 
 app.get('/ethsgd', (req, res) => {
   rates.ETHSGD().then(value => res.send(value));
+});
+
+app.post('/services/:id', (req, res) => {
+  services.handle(req.params.id, req.body.value, req.body.params, req.body.description).then((response) => {
+    res.send(response);
+  }, err => res.status(500).send(err.toString()));
 });
 
 /*

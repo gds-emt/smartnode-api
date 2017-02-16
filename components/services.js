@@ -1,0 +1,23 @@
+const marketplace = require('./marketplace');
+const wallet = require('./wallet');
+// const { Wallet } = require('./contracts');
+// const { SNServiceInterface: Service } = require('./contracts');
+
+function handle(id, value, params, _description = null) {
+  return new Promise((resolve, reject) => {
+    if (!marketplace[id]) {
+      return reject('No services found');
+    }
+
+    if (wallet.status().wallet.balance < value) {
+      return reject('Insufficient balance');
+    }
+
+    const description = _description || marketplace[id].description;
+    return wallet.makeRequest(marketplace[id].address, value, params, description).then(tx => (
+      resolve(`Success. Transaction hash: ${tx}.`)
+    )).catch(err => reject(err));
+  });
+}
+
+module.exports = { handle };

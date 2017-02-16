@@ -23,6 +23,10 @@ contract Wallet {
     owner = msg.sender;
   }
 
+  function Wallet() {
+    owner = msg.sender;
+  }
+
   function send(address _to, uint256 _value) public onlyOwner {
     if (!_to.call.value(_value)()) {
       throw;
@@ -30,13 +34,11 @@ contract Wallet {
     Transfer(this, msg.sender, _value);
   }
 
-  function request(address _service, uint256 _value, string _params, string _description) public onlyOwner {
-    uint256 requestId = SNServiceInterface(_service).make.value(_value).gas(30000)(_params);
+  function makeRequest(address _service, uint256 _value, string _params, string _description) public onlyOwner {
+    uint256 requestId = SNServiceInterface(_service).make.value(_value)(_params);
     if (requestId >= 0) {
       RequestMade(_service, requestId, _value, _description);
       Transfer(this, _service, _value);
-    } else {
-      throw;
     }
   }
 

@@ -1,7 +1,10 @@
+const config = require('config');
 const web3 = require('./web3');
+const { getAddress } = require('./utils');
 const { Wallet } = require('./contracts');
 
 const wallet = Wallet.deployed();
+const owner = getAddress(config.get('eth.walletOwnerAccount'));
 
 function status() {
   return {
@@ -69,4 +72,14 @@ function transactions() {
   });
 }
 
-module.exports = { status, transactions };
+function makeRequest(serviceAddress, value, _params, description) {
+  const params = (typeof _params === 'string') ? _params : JSON.stringify(_params);
+
+console.log(serviceAddress, value, params, description);
+  return Wallet.deployed().makeRequest(serviceAddress, value, params, description, {
+    from: owner,
+    gas: config.get('eth.defaultGas'),
+  });
+}
+
+module.exports = { status, transactions, makeRequest };
