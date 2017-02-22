@@ -1,5 +1,6 @@
 const marketplace = require('./marketplace');
 const wallet = require('./wallet');
+const web3 = require('./web3');
 // const { Wallet } = require('./contracts');
 // const { SNServiceInterface: Service } = require('./contracts');
 
@@ -9,7 +10,7 @@ function handle(id, value, params, _description = null) {
       return reject('No services found');
     }
 
-    if (wallet.status().wallet.balance < value) {
+    if (wallet.status().wallet.balance.lt(web3.toBigNumber(value))) {
       return reject('Insufficient balance');
     }
 

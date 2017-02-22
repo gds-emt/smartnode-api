@@ -75,7 +75,6 @@ function transactions() {
 function makeRequest(serviceAddress, value, _params, description) {
   const params = (typeof _params === 'string') ? _params : JSON.stringify(_params);
 
-console.log(serviceAddress, value, params, description);
   return Wallet.deployed().makeRequest(serviceAddress, value, params, description, {
     from: owner,
     gas: config.get('eth.defaultGas'),

@@ -48,11 +48,13 @@ app.get('/transactions', (req, res) => {
   wallet.transactions().then(response => res.send(response));
 });
 */
+
 const server = http.createServer(app).listen(config.get('server.port'), () => {
 // const server = app.listen(config.get('server.port'), () => {
   const host = server.address().address;
   const port = server.address().port;
 
+  console.log(wallet.status());
   console.log(`Smartnode API server is now listening at http://${host}:${port}`);
 });
 
@@ -69,6 +71,7 @@ if (config.get('server.https') && config.get('server.https.port')) {
     const host = httpsServer.address().address;
     const port = httpsServer.address().port;
 
+    console.log(wallet.status());
     console.log(`Smartnode HTTPS API server is now listening at http://${host}:${port}`);
   });
 }
