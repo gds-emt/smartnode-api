@@ -23,7 +23,7 @@ module.exports = {
 
   eth: {
     walletOwnerAccount: 0, // Unlocked account, either address or int (i-th account at web3.eth.accounts)
-    defaultGas: 100000,
+    defaultGas: 300000,
   },
 
   ext: {
@@ -34,5 +34,13 @@ module.exports = {
       apiKey: 'COINBASE API KEY',
       apiSecret: 'COINBASE API SECRET',
     },
+  },
+
+  /**
+   * To manually specify contract address of services
+   * This can be done away when we have a Marketplace smart contract
+   */
+  marketplace: {
+    honestbee: '0xxxxxxxxxxxxxxxxxxxxxx',
   },
 };
