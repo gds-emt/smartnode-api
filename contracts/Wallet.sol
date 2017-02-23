@@ -8,7 +8,6 @@ import 'SNServiceInterface.sol';
 contract Wallet {
   address public owner;
 
-  event Deposit(address indexed _from, uint256 _value);
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event RequestMade(address indexed _service, uint256 indexed requestId, uint256 _value, string _description);
 
@@ -48,7 +47,6 @@ contract Wallet {
 
   function () payable {
     if (msg.value > 0) {
-      Deposit(msg.sender, msg.value);
       Transfer(msg.sender, this, msg.value);
     }
   }
