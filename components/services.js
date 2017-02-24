@@ -15,9 +15,13 @@ function handle(id, value, params, _description = null) {
     }
 
     const description = _description || marketplace[id].description;
-    return wallet.makeRequest(marketplace[id].address, value, params, description).then(tx => (
-      resolve(`Success. Transaction hash: ${tx}.`)
-    )).catch(err => reject(err));
+
+    // Purposely not waiting for it to be mined
+    wallet.makeRequest(marketplace[id].address, value, params, description).catch((err) => {
+      console.warn(err);
+    });
+
+    return resolve('Request successfully made');
   });
 }
 
