@@ -1,7 +1,9 @@
 const { Wallet } = require('./contracts');
+const marketplace = require('./marketplace');
 const web3 = require('./web3');
 
 const wallet = Wallet.deployed();
+const servicesByAddress = [];
 
 const demo = [
   {
@@ -59,6 +61,21 @@ const demo = [
   },
 ];
 
+function getServiceByAddress(address) {
+  if (servicesByAddress.length === 0) {
+    const names = Object.keys(marketplace);
+    names.forEach((name) => {
+      const service = marketplace[name];
+      servicesByAddress[service.address] = service;
+    });
+  }
+
+  if (servicesByAddress[address]) {
+    return servicesByAddress[address];
+  }
+  return null;
+}
+
 function list() {
   const TransferEvent = new Promise((resolve, reject) => {
     wallet.Transfer({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
@@ -66,7 +83,6 @@ function list() {
         return reject(err);
       }
       const transactions = [];
-
       results.forEach((result) => {
         const args = result.args;
         const block = web3.eth.getBlock(result.blockNumber);
@@ -74,7 +90,7 @@ function list() {
           blockNumber: result.blockNumber,
           blockHash: result.blockHash,
           timestamp: block.timestamp,
-          transactionhash: result.transactionHash,
+          transactionHash: result.transactionHash,
           value: args._value.toString(),
         };
         if (args._from === wallet.address) {
@@ -91,11 +107,108 @@ function list() {
   });
 
   const RequestMadeEvent = new Promise((resolve, reject) => {
-
+    wallet.RequestMade({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(results);
+    });
   });
 
-  return Promise.all([TransferEvent]).then((results) => {
-    const response = results[0].concat(demo);
+  const RequestRefundedEvent = new Promise((resolve, reject) => {
+    wallet.RequestRefunded({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(results);
+    });
+  });
+
+  return Promise.all([TransferEvent, RequestMadeEvent, RequestRefundedEvent]).then((results) => {
+    let response = results[0].concat(demo);
+    // response.sort((a, b) => a.timestamp - b.timestamp); // ascending
+/*
+    response.map((tx) => {
+      if (tx.demo) {
+        return true;
+      }
+    });
+*/
+    const reqIndex = {};
+    const refIndex = {};
+    const toRemoveFromMain = {};
+    if (results[1] && results[1].length > 0) {
+      const requests = results[1];
+      requests.forEach((request) => {
+        reqIndex[request.blockNumber.toString() + request.args._service] = request;
+      });
+    }
+    if (results[2] && results[2].length > 0) {
+      const refunds = results[2];
+      refunds.forEach((refund) => {
+        if (!refIndex[refund.args._requestId + refund.args._service]) {
+          refIndex[refund.args._requestId + refund.args._service] = [];
+        }
+        refIndex[refund.args._requestId + refund.args._service].push(refund);
+      });
+    }
+
+    response.map((res) => {
+      if (res.demo) {
+        return res;
+      }
+
+      const newRes = res;
+
+      if (res.type === 'send' && reqIndex[res.blockNumber.toString() + res.address]) {
+        const req = reqIndex[res.blockNumber.toString() + res.address];
+        const service = getServiceByAddress(res.address);
+        const requestId = req.args._requestId;
+        newRes.type = 'service';
+        newRes.service = service;
+        newRes.service.requestId = requestId;
+        newRes.service.complete = false;
+        if (req.args._description) {
+          newRes.service.description = req.args._description;
+        }
+
+        newRes.transactions = [];
+        newRes.transactions.push({
+          blockNumber: res.blockNumber,
+          blockHash: res.blockHash,
+          timestamp: res.timestamp,
+          transactionHash: res.transactionHash,
+          type: 'send',
+          value: res.value,
+        });
+
+        // Fill in other transactions
+        if (refIndex[requestId + service.address]) {
+          const refunds = refIndex[requestId + service.address];
+          refunds.forEach((refund) => {
+            const refundValue = refund.args._value;
+            newRes.transactions.push({
+              blockNumber: refund.blockNumber,
+              blockHash: refund.blockHash,
+              timestamp: web3.eth.getBlock(refund.blockNumber).timestamp,
+              transactionHash: refund.transactionHash,
+              type: 'receive',
+              value: refundValue,
+            });
+            newRes.service.complete = true;
+            newRes.value -= refundValue;
+
+            toRemoveFromMain[refund.blockNumber.toString() + refund.args._service] = true;
+          });
+        }
+      }
+
+      return newRes;
+    });
+
+
+    response = response.filter(res => (res.demo || !toRemoveFromMain[res.blockNumber.toString() + res.address]));
+
     response.sort((a, b) => b.timestamp - a.timestamp); // descending
     return response;
   });
