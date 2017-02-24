@@ -60,12 +60,13 @@ const demo = [
 ];
 
 function list() {
-  const transferEvent = new Promise((resolve, reject) => {
-    const transactions = [];
-    wallet.Transfer().get((err, results) => {
+  const TransferEvent = new Promise((resolve, reject) => {
+    wallet.Transfer({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
       if (err) {
         return reject(err);
       }
+      const transactions = [];
+
       results.forEach((result) => {
         const args = result.args;
         const block = web3.eth.getBlock(result.blockNumber);
@@ -75,7 +76,6 @@ function list() {
           timestamp: block.timestamp,
           transactionhash: result.transactionHash,
           value: args._value.toString(),
-          demo: false,
         };
         if (args._from === wallet.address) {
           transaction.type = 'send';
@@ -90,8 +90,14 @@ function list() {
     });
   });
 
-  return Promise.all([transferEvent]).then((results) => {
-    return results[0].concat(demo);
+  const RequestMadeEvent = new Promise((resolve, reject) => {
+
+  });
+
+  return Promise.all([TransferEvent]).then((results) => {
+    const response = results[0].concat(demo);
+    response.sort((a, b) => b.timestamp - a.timestamp); // descending
+    return response;
   });
 }
 
