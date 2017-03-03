@@ -16,7 +16,7 @@ contract SNServiceInterface {
    * 60: complete, rejected or failed
    */
   event NewRequest(uint256 indexed _id, address indexed _client, string _params);
-  event RequestUpdate(uint256 indexed _id, uint8 _state, uint256 _balance);
+  event RequestUpdate(uint256 indexed _id, uint8 _state, uint256 _balance, string _remarks);
 
 
   /**

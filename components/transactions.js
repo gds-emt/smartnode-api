@@ -1,4 +1,4 @@
-const { Wallet } = require('./contracts');
+const { Wallet, SNServiceInterface } = require('./contracts');
 const marketplace = require('./marketplace');
 const web3 = require('./web3');
 
@@ -76,6 +76,21 @@ function getServiceByAddress(address) {
   return null;
 }
 
+/**
+ * Get remarks from service contract
+ */
+function getRemarks(address, blockNumber) {
+  return new Promise((resolve, reject) => {
+    const service = SNServiceInterface.at(address);
+    service.RequestUpdate({}, { fromBlock: blockNumber, toBlock: blockNumber }).get((err, event) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(event[0].args._remarks);
+    });
+  });
+}
+
 function list() {
   const TransferEvent = new Promise((resolve, reject) => {
     wallet.Transfer({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
@@ -120,20 +135,21 @@ function list() {
       if (err) {
         return reject(err);
       }
-      return resolve(results);
+
+      const remarksPromises = [];
+      results.forEach((result) => {
+        remarksPromises.push(getRemarks(result.args._service, result.blockNumber));
+      });
+      return Promise.all(remarksPromises).then((remarks) => {
+        const refunds = results.map((result, i) => Object.assign({}, result, { remarks: remarks[i] }));
+        return resolve(refunds);
+      });
     });
   });
 
   return Promise.all([TransferEvent, RequestMadeEvent, RequestRefundedEvent]).then((results) => {
     let response = results[0].concat(demo);
-    // response.sort((a, b) => a.timestamp - b.timestamp); // ascending
-/*
-    response.map((tx) => {
-      if (tx.demo) {
-        return true;
-      }
-    });
-*/
+
     const reqIndex = {};
     const refIndex = {};
     const toRemoveFromMain = {};
@@ -194,6 +210,7 @@ function list() {
               transactionHash: refund.transactionHash,
               type: 'receive',
               value: refundValue,
+              remarks: refund.remarks,
             });
             newRes.service.complete = true;
             newRes.value -= refundValue;
@@ -206,7 +223,6 @@ function list() {
       return newRes;
     });
 
-
     response = response.filter(res => (res.demo || !toRemoveFromMain[res.blockNumber.toString() + res.address]));
 
     response.sort((a, b) => b.timestamp - a.timestamp); // descending
@@ -214,4 +230,4 @@ function list() {
   });
 }
 
-module.exports = { list };
+module.exports = { list, getRemarks };
