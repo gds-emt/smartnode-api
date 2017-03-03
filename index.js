@@ -37,6 +37,14 @@ app.get('/ethsgd', (req, res) => {
   rates.ETHSGD().then(value => res.send(value));
 });
 
+app.post('/send', (req, res) => {
+  // Purposely not waiting for it to be mined
+  wallet.send(req.body.address, req.body.value).catch((err) => {
+    console.warn(err);
+  });
+  res.send('Request made successfully.');
+});
+
 app.post('/services/:id', (req, res) => {
   services.handle(req.params.id, req.body.value, req.body.params, req.body.description).then((response) => {
     res.send(response);

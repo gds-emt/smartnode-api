@@ -30,4 +30,11 @@ function makeRequest(serviceAddress, value, _params, description) {
   });
 }
 
-module.exports = { status, transactions, makeRequest };
+function send(address, value) {
+  return Wallet.deployed().send(address, web3.toBigNumber(value), {
+    from: owner,
+    gas: config.get('eth.defaultGas'),
+  });
+}
+
+module.exports = { status, transactions, makeRequest, send };
