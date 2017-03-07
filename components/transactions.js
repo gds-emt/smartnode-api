@@ -179,6 +179,9 @@ function list() {
       if (res.type === 'send' && reqIndex[res.blockNumber.toString() + res.address]) {
         const req = reqIndex[res.blockNumber.toString() + res.address];
         const service = getServiceByAddress(res.address);
+        if (!service) {
+          console.log(`No service found at address ${res.address}`);
+        }
         const requestId = req.args._requestId;
         newRes.type = 'service';
         newRes.service = service;
