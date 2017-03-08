@@ -5,6 +5,12 @@ const web3 = require('./web3');
 const wallet = Wallet.deployed();
 const servicesByAddress = [];
 
+// Cache
+const cache = {
+  lastBlock: 0,
+  response: [],
+};
+
 const demo = [
   {
     type: 'service', // service, receive or send
@@ -93,7 +99,7 @@ function getRemarks(address, blockNumber) {
 
 function list() {
   const TransferEvent = new Promise((resolve, reject) => {
-    wallet.Transfer({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
+    wallet.Transfer({}, { fromBlock: cache.lastBlock, toBlock: 'latest' }).get((err, results) => {
       if (err) {
         return reject(err);
       }
@@ -116,13 +122,19 @@ function list() {
           transaction.address = args._from;
         }
         transactions.push(transaction);
+
+        // Reset cache
+        if (result.blockNumber > cache.lastBlock) {
+          cache.lastBlock = result.blockNumber;
+          cache.response = [];
+        }
       });
       return resolve(transactions);
     });
   });
 
   const RequestMadeEvent = new Promise((resolve, reject) => {
-    wallet.RequestMade({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
+    wallet.RequestMade({}, { fromBlock: cache.lastBlock, toBlock: 'latest' }).get((err, results) => {
       if (err) {
         return reject(err);
       }
@@ -131,7 +143,7 @@ function list() {
   });
 
   const RequestRefundedEvent = new Promise((resolve, reject) => {
-    wallet.RequestRefunded({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
+    wallet.RequestRefunded({}, { fromBlock: cache.lastBlock, toBlock: 'latest' }).get((err, results) => {
       if (err) {
         return reject(err);
       }
@@ -148,6 +160,10 @@ function list() {
   });
 
   return Promise.all([TransferEvent, RequestMadeEvent, RequestRefundedEvent]).then((results) => {
+    if (cache.response.length > 0) {
+      return cache.response;
+    }
+
     let response = results[0].concat(demo);
 
     const reqIndex = {};
@@ -229,6 +245,8 @@ function list() {
     response = response.filter(res => (res.demo || !toRemoveFromMain[res.blockNumber.toString() + res.address]));
 
     response.sort((a, b) => b.timestamp - a.timestamp); // descending
+
+    cache.response = response;
     return response;
   });
 }
