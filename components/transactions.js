@@ -113,7 +113,7 @@ function list() {
           blockHash: result.blockHash,
           timestamp: block.timestamp,
           transactionHash: result.transactionHash,
-          value: args._value.toString(),
+          value: args._value,
         };
         if (args._from === wallet.address) {
           transaction.type = 'send';
@@ -236,7 +236,7 @@ function list() {
               remarks: refund.remarks,
             });
             newRes.service.complete = true;
-            newRes.value -= refundValue;
+            newRes.value = newRes.value.minus(refundValue);
 
             toRemoveFromMain[refund.blockNumber.toString() + refund.args._service] = true;
           });
