@@ -7,7 +7,8 @@ const servicesByAddress = [];
 
 // Cache
 const cache = {
-  lastBlock: 0,
+  lastBlock: -1,
+  rebuild: false,
   response: [],
 };
 
@@ -99,7 +100,7 @@ function getRemarks(address, blockNumber) {
 
 function list() {
   const TransferEvent = new Promise((resolve, reject) => {
-    wallet.Transfer({}, { fromBlock: cache.lastBlock, toBlock: 'latest' }).get((err, results) => {
+    wallet.Transfer({}, { fromBlock: cache.lastBlock + 1, toBlock: 'latest' }).get((err, results) => {
       if (err) {
         return reject(err);
       }
@@ -126,7 +127,7 @@ function list() {
         // Reset cache
         if (result.blockNumber > cache.lastBlock) {
           cache.lastBlock = result.blockNumber;
-          cache.response = [];
+          cache.rebuild = true;
         }
       });
       return resolve(transactions);
@@ -134,7 +135,7 @@ function list() {
   });
 
   const RequestMadeEvent = new Promise((resolve, reject) => {
-    wallet.RequestMade({}, { fromBlock: cache.lastBlock, toBlock: 'latest' }).get((err, results) => {
+    wallet.RequestMade({}, { fromBlock: cache.lastBlock + 1, toBlock: 'latest' }).get((err, results) => {
       if (err) {
         return reject(err);
       }
@@ -143,7 +144,7 @@ function list() {
   });
 
   const RequestRefundedEvent = new Promise((resolve, reject) => {
-    wallet.RequestRefunded({}, { fromBlock: cache.lastBlock, toBlock: 'latest' }).get((err, results) => {
+    wallet.RequestRefunded({}, { fromBlock: cache.lastBlock + 1, toBlock: 'latest' }).get((err, results) => {
       if (err) {
         return reject(err);
       }
@@ -160,11 +161,14 @@ function list() {
   });
 
   return Promise.all([TransferEvent, RequestMadeEvent, RequestRefundedEvent]).then((results) => {
-    if (cache.response.length > 0) {
+    if (!cache.rebuild) {
       return cache.response;
     }
 
-    let response = results[0].concat(demo);
+    let response = cache.response.concat(results[0]);
+    if (cache.response.length === 0) {
+      response = results[0].concat(demo);
+    }
 
     const reqIndex = {};
     const refIndex = {};
@@ -247,6 +251,7 @@ function list() {
     response.sort((a, b) => b.timestamp - a.timestamp); // descending
 
     cache.response = response;
+    cache.rebuild = false;
     return response;
   });
 }
