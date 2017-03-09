@@ -115,9 +115,11 @@ function list() {
           transactionHash: result.transactionHash,
           value: args._value,
         };
+
         if (args._from === wallet.address) {
           transaction.type = 'send';
           transaction.address = args._to;
+          transaction.value = transaction.value.times(-1);
         } else {
           transaction.type = 'receive';
           transaction.address = args._from;
@@ -236,7 +238,7 @@ function list() {
               remarks: refund.remarks,
             });
             newRes.service.complete = true;
-            newRes.value = newRes.value.minus(refundValue);
+            newRes.value = newRes.value.plus(refundValue);
 
             toRemoveFromMain[refund.blockNumber.toString() + refund.args._service] = true;
           });
