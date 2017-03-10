@@ -8,7 +8,6 @@ const servicesByAddress = [];
 // Cache
 const cache = {
   lastBlock: -1,
-  rebuild: false,
   response: [],
 };
 
@@ -98,9 +97,9 @@ function getRemarks(address, blockNumber) {
   });
 }
 
-function list() {
+function listRebuild() {
   const TransferEvent = new Promise((resolve, reject) => {
-    wallet.Transfer({}, { fromBlock: cache.lastBlock + 1, toBlock: 'latest' }).get((err, results) => {
+    wallet.Transfer({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
       if (err) {
         return reject(err);
       }
@@ -126,10 +125,8 @@ function list() {
         }
         transactions.push(transaction);
 
-        // Reset cache
         if (result.blockNumber > cache.lastBlock) {
           cache.lastBlock = result.blockNumber;
-          cache.rebuild = true;
         }
       });
       return resolve(transactions);
@@ -137,7 +134,7 @@ function list() {
   });
 
   const RequestMadeEvent = new Promise((resolve, reject) => {
-    wallet.RequestMade({}, { fromBlock: cache.lastBlock + 1, toBlock: 'latest' }).get((err, results) => {
+    wallet.RequestMade({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
       if (err) {
         return reject(err);
       }
@@ -146,7 +143,7 @@ function list() {
   });
 
   const RequestRefundedEvent = new Promise((resolve, reject) => {
-    wallet.RequestRefunded({}, { fromBlock: cache.lastBlock + 1, toBlock: 'latest' }).get((err, results) => {
+    wallet.RequestRefunded({}, { fromBlock: 0, toBlock: 'latest' }).get((err, results) => {
       if (err) {
         return reject(err);
       }
@@ -163,14 +160,8 @@ function list() {
   });
 
   return Promise.all([TransferEvent, RequestMadeEvent, RequestRefundedEvent]).then((results) => {
-    if (!cache.rebuild) {
-      return cache.response;
-    }
-
-    let response = cache.response.concat(results[0]);
-    if (cache.response.length === 0) {
-      response = results[0].concat(demo);
-    }
+    let response = results[0].concat(demo);
+    console.log(results);
 
     const reqIndex = {};
     const refIndex = {};
@@ -251,10 +242,29 @@ function list() {
     response = response.filter(res => (res.demo || !toRemoveFromMain[res.blockNumber.toString() + res.address]));
 
     response.sort((a, b) => b.timestamp - a.timestamp); // descending
-
-    cache.response = response;
-    cache.rebuild = false;
     return response;
+  });
+}
+
+function list() {
+  return new Promise((resolve, reject) => {
+    // Check if need to rebuild fresh
+    wallet.Transfer({}, { fromBlock: cache.lastBlock + 1, toBlock: 'latest' }).get((err, results) => {
+      if (err) {
+        return reject(err);
+      }
+
+      if (results.length === 0) {
+        console.log('Transactions from cache.');
+        return resolve(cache.response);
+      }
+
+      console.log('Rebuilding transactions...');
+      return listRebuild().then((response) => {
+        cache.response = response;
+        resolve(response);
+      }).catch(rebuildErr => reject(rebuildErr));
+    });
   });
 }
 
