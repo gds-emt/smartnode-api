@@ -161,7 +161,6 @@ function listRebuild() {
 
   return Promise.all([TransferEvent, RequestMadeEvent, RequestRefundedEvent]).then((results) => {
     let response = results[0].concat(demo);
-    console.log(results);
 
     const reqIndex = {};
     const refIndex = {};
@@ -197,7 +196,7 @@ function listRebuild() {
         }
         const requestId = req.args._requestId;
         newRes.type = 'service';
-        newRes.service = service;
+        newRes.service = Object.assign({}, service);
         newRes.service.requestId = requestId;
         newRes.service.complete = false;
         if (req.args._description) {
