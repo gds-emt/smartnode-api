@@ -31,7 +31,7 @@ contract Wallet {
     if (!_to.call.value(_value)()) {
       throw;
     }
-    Transfer(this, msg.sender, _value);
+    Transfer(this, _to, _value);
   }
 
   function makeRequest(address _service, uint256 _value, string _params, string _description) public onlyOwner returns (bool success) {
