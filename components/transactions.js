@@ -20,7 +20,7 @@ const demo = [
     demo: true,
     service: {
       name: 'Singapore Power',
-      icon: 'https://media.glassdoor.com/sqll/389323/singapore-power-squarelogo-1398797969587.png',
+      icon: 'https://s3-ap-southeast-1.amazonaws.com/smartnode-services/sp.png',
       description: 'Power consumption for the month',
       complete: true,
     },
@@ -33,7 +33,7 @@ const demo = [
     demo: true,
     service: {
       name: 'honestbee',
-      icon: 'https://pbs.twimg.com/profile_images/743759173834334209/GcCRFPRh.jpg',
+      icon: 'https://s3-ap-southeast-1.amazonaws.com/smartnode-services/honestbee.jpg',
       description: '100 Nespresso capsules',
       complete: false, // still pending refund or processing
     },
@@ -53,7 +53,7 @@ const demo = [
     demo: true,
     service: {
       name: 'Uber',
-      icon: 'https://pbs.twimg.com/profile_images/697242369154940928/p9jxYqy5.png',
+      icon: 'https://s3-ap-southeast-1.amazonaws.com/smartnode-services/uber.jpg',
       description: 'Ride to office',
       complete: true,
     },

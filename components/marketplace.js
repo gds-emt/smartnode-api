@@ -8,7 +8,7 @@ const config = require('config');
 const honestbee = {
   id: 'honestbee',
   name: 'honestbee',
-  icon: 'https://pbs.twimg.com/profile_images/743759173834334209/GcCRFPRh.jpg',
+  icon: 'https://s3-ap-southeast-1.amazonaws.com/smartnode-services/honestbee.jpg',
   address: config.get('marketplace.honestbee'),
   description: 'Ordering of groceries',
   params: ['order_id'],
